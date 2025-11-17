@@ -96,6 +96,7 @@ line-length = 88
 indent-width = 4
 fix = true
 show-fixes = true
+preview = true  # Enable preview rules (PLR1702, etc.)
 
 [tool.ruff.lint]
 # Comprehensive rule set for strict checking
@@ -107,6 +108,7 @@ select = [
     "B",      # flake8-bugbear
     "BLE",    # flake8-blind-except (no bare except:)
     "C4",     # flake8-comprehensions
+    "C90",    # mccabe complexity
     "T20",    # flake8-print (no print statements)
     "SIM",    # flake8-simplify
     "N",      # pep8-naming
@@ -116,10 +118,11 @@ select = [
     "S",      # flake8-bandit (security)
     "PTH",    # flake8-use-pathlib
     "ERA",    # eradicate (commented-out code)
-    "PL",     # pylint
+    "PL",     # pylint (includes PLR1702: too-many-nested-blocks)
     "PERF",   # perflint (performance)
     "ANN",    # flake8-annotations
     "ARG",    # flake8-unused-arguments
+    "FBT",    # flake8-boolean-trap (no boolean positional args)
     "RET",    # flake8-return
     "TCH",    # flake8-type-checking
 ]
@@ -130,6 +133,13 @@ ignore = [
     "S607",    # Starting a process with a partial path (too strict)
 ]
 
+# Complexity limits (anti-LLM-slop)
+[tool.ruff.lint.mccabe]
+max-complexity = 10  # Maximum cyclomatic complexity
+
+[tool.ruff.lint.pylint]
+max-nested-blocks = 3  # Maximum nested block depth (PLR1702)
+
 # Per-file ignores
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = [
@@ -139,6 +149,7 @@ ignore = [
     "S101",    # Allow assert in tests
     "PLR2004", # Allow magic values in tests
     "ANN",     # Don't require annotations in tests
+    "FBT",     # Allow boolean args in tests
 ]
 
 [tool.ruff.lint.isort]

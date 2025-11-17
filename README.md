@@ -172,6 +172,133 @@ If this is too strict for an existing project, you can **progressively relax** s
 
 ---
 
+## Anti-Slop: Best Practices for AI-Assisted Development
+
+This template is specifically designed to prevent common "LLM slop" - the anti-patterns that AI code assistants tend to produce. Here are key patterns to follow:
+
+### 1. **Pydantic Models for All IO**
+
+Never work with raw dictionaries, JSON, or untyped data. Always define a Pydantic model and validate **immediately** at the boundary:
+
+```python
+# ❌ BAD: Raw dict from API/file
+def process_user_data(data: dict) -> None:
+    name = data["name"]  # Could fail, no validation
+    age = data.get("age", 0)  # Type is Any
+
+# ✅ GOOD: Pydantic model + immediate validation
+from pydantic import BaseModel, Field
+
+class UserData(BaseModel):
+    name: str = Field(min_length=1)
+    age: int = Field(ge=0, le=150)
+
+def process_user_data(data: dict) -> None:
+    user = UserData.model_validate(data)  # Fails fast with clear errors
+    # Now user.name and user.age are fully typed and validated
+```
+
+This applies to:
+- **API responses**: `response.json()` → immediate `Model.model_validate()`
+- **Config files**: `json.load()` → immediate `Model.model_validate()`
+- **CLI arguments**: `argparse.Namespace` → convert to Pydantic model
+- **Environment variables**: Use `pydantic-settings` instead of raw `os.getenv()`
+
+### 2. **Dataframe Schemas with Pandera** (if using pandas/polars)
+
+If you work with DataFrames, uncomment Pandera in dependencies and always define schemas:
+
+```python
+import pandera as pa
+from pandera.typing import DataFrame
+
+class SalesSchema(pa.DataFrameModel):
+    product_id: int = pa.Field(gt=0)
+    revenue: float = pa.Field(ge=0)
+    date: pa.DateTime
+
+def process_sales(df: DataFrame[SalesSchema]) -> DataFrame[SalesSchema]:
+    validated = SalesSchema.validate(df, lazy=True)
+    # Now every column is typed and validated
+    return validated
+```
+
+### 3. **Avoid Boolean Traps**
+
+The `FBT` rule catches this common LLM mistake:
+
+```python
+# ❌ BAD: What does True mean here?
+send_email(user, True, False)
+
+# ✅ GOOD: Use enums or keyword-only args
+from enum import Enum
+
+class EmailFormat(Enum):
+    HTML = "html"
+    PLAIN = "plain"
+
+def send_email(
+    user: User,
+    *,  # Force keyword-only
+    format: EmailFormat,
+    async_send: bool = False
+) -> None: ...
+
+send_email(user, format=EmailFormat.HTML, async_send=False)
+```
+
+### 4. **Keep Functions Simple**
+
+This template enforces:
+- **Max complexity: 10** (McCabe)
+- **Max nested blocks: 3** (no deeply nested if/for/while)
+
+If you hit these limits, refactor into smaller functions:
+
+```python
+# ❌ BAD: Complex nested logic
+def process_order(order):
+    if order.valid:
+        if order.in_stock:
+            if order.payment_ok:
+                if order.address_valid:
+                    # 4 levels deep!
+                    ...
+
+# ✅ GOOD: Early returns + helper functions
+def process_order(order: Order) -> None:
+    if not order.valid:
+        raise InvalidOrderError()
+    if not order.in_stock:
+        raise OutOfStockError()
+
+    validate_payment(order)
+    validate_address(order)
+    ship_order(order)
+```
+
+### 5. **No Bare Excepts**
+
+LLMs love `except Exception:` or bare `except:`. The `BLE` rule catches this:
+
+```python
+# ❌ BAD: Hides all errors
+try:
+    risky_operation()
+except Exception:  # BLE001 error
+    pass
+
+# ✅ GOOD: Catch specific exceptions
+try:
+    risky_operation()
+except (ValueError, KeyError) as e:
+    logger.error(f"Expected error: {e}")
+    raise
+```
+
+---
+
 ## VS Code Setup (Recommended)
 
 In a project using this template, a typical `.vscode/settings.json` would:
