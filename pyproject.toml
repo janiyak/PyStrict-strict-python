@@ -306,12 +306,19 @@ python_functions = ["test_*"]
 addopts = [
     "--strict-markers",
     "--strict-config",
+    "-W error",  # STRICT: Treat warnings as errors (catch deprecations early)
     "--tb=short",
     "--cov=.",
     "--cov-report=term-missing:skip-covered",
     "--cov-report=html",
     "--cov-report=xml",
     "--cov-fail-under=80",  # STRICT: Require 80% coverage
+]
+filterwarnings = [
+    "error",  # Treat all warnings as errors by default
+    # Uncomment to selectively ignore specific third-party warnings if needed:
+    # "ignore::DeprecationWarning:some_noisy_library",
+    # "ignore::UserWarning:another_library",
 ]
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
