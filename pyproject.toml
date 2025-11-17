@@ -22,6 +22,9 @@ dependencies = [
     "types-requests",
     "python-dotenv",
     "typing-extensions>=4.12",
+    # Uncomment if using pandas/polars for DataFrame schema validation:
+    # "pandera[strategies]>=0.20.0",  # With hypothesis strategies for testing
+    # "pandas>=2.0.0",  # or "polars>=0.19.0"
 ]
 
 [project.optional-dependencies]
@@ -31,7 +34,7 @@ dev = [
     "gitingest",
     "poethepoet",
     "radon",
-    "vulture"
+    "skylos"
 ]
 
 [tool.setuptools.packages.find]
@@ -69,7 +72,7 @@ lint-unsafe = {cmd = "ruff check . --fix --unsafe-fixes"}
 # Run with: poe metrics or uv run poe metrics
 # Check code quality: dead code, complexity, and maintainability
 metrics = [
-    {cmd = "vulture . --min-confidence 80"},
+    {cmd = "skylos . --quality"},
     {cmd = "radon cc . -a -nb"},
     {cmd = "radon mi . -nb"}
 ]
@@ -80,7 +83,7 @@ quality = [
     {cmd = "ruff format ."},
     {cmd = "ruff check . --fix"},
     {cmd = "basedpyright --level error"},
-    {cmd = "vulture . --min-confidence 80 --exclude .venv,build,dist,docs,scripts,tests"},
+    {cmd = "skylos . --quality --danger"},
     {cmd = "radon cc . -a -nb"}
 ]
 
@@ -93,6 +96,7 @@ line-length = 88
 indent-width = 4
 fix = true
 show-fixes = true
+preview = true  # Enable preview rules (PLR1702, etc.)
 
 [tool.ruff.lint]
 # Comprehensive rule set for strict checking
@@ -102,7 +106,9 @@ select = [
     "I",      # isort
     "UP",     # pyupgrade
     "B",      # flake8-bugbear
+    "BLE",    # flake8-blind-except (no bare except:)
     "C4",     # flake8-comprehensions
+    "C90",    # mccabe complexity
     "T20",    # flake8-print (no print statements)
     "SIM",    # flake8-simplify
     "N",      # pep8-naming
@@ -112,10 +118,11 @@ select = [
     "S",      # flake8-bandit (security)
     "PTH",    # flake8-use-pathlib
     "ERA",    # eradicate (commented-out code)
-    "PL",     # pylint
+    "PL",     # pylint (includes PLR1702: too-many-nested-blocks)
     "PERF",   # perflint (performance)
     "ANN",    # flake8-annotations
     "ARG",    # flake8-unused-arguments
+    "FBT",    # flake8-boolean-trap (no boolean positional args)
     "RET",    # flake8-return
     "TCH",    # flake8-type-checking
 ]
@@ -126,6 +133,13 @@ ignore = [
     "S607",    # Starting a process with a partial path (too strict)
 ]
 
+# Complexity limits (anti-LLM-slop)
+[tool.ruff.lint.mccabe]
+max-complexity = 10  # Maximum cyclomatic complexity
+
+[tool.ruff.lint.pylint]
+max-nested-blocks = 3  # Maximum nested block depth (PLR1702)
+
 # Per-file ignores
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = [
@@ -135,6 +149,7 @@ ignore = [
     "S101",    # Allow assert in tests
     "PLR2004", # Allow magic values in tests
     "ANN",     # Don't require annotations in tests
+    "FBT",     # Allow boolean args in tests
 ]
 
 [tool.ruff.lint.isort]
@@ -334,3 +349,26 @@ exclude_lines = [
     "@abstractmethod",
     "@overload",
 ]
+
+# ============================================================
+# PANDERA CONFIGURATION (DataFrame Schema Validation)
+# Uncomment this section if using pandas/polars
+# ============================================================
+# [tool.pandera]
+# # Enable strict validation mode
+# strict = true
+#
+# # Validate on assignment (runtime checks)
+# # from pandera.typing import DataFrame, Series
+# # df: DataFrame[MySchema] = pd.DataFrame(...)
+#
+# # Example usage pattern:
+# # 1. Define schema: class MySchema(pa.DataFrameModel): ...
+# # 2. Validate: MySchema.validate(df, lazy=True)
+# # 3. Use typing: def process(df: DataFrame[MySchema]) -> DataFrame[OutputSchema]
+# #
+# # For testing, use pandera.strategies:
+# # @given(df=MySchema.strategy(size=10))
+# # def test_my_function(df):
+# #     result = my_function(df)
+# #     assert OutputSchema.validate(result)
