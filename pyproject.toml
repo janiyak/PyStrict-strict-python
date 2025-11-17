@@ -158,7 +158,7 @@ line-ending = "auto"
 # Basedpyright CONFIGURATION - MAXIMUM STRICTNESS
 # TypeScript strict mode equivalent
 # ============================================================
-[tool.basedpyrightf]
+[tool.basedpyright]
 pythonVersion = "3.12"
 typeCheckingMode = "strict"
 
