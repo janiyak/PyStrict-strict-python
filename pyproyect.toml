@@ -1,7 +1,7 @@
 # ============================================================
 # ULTRA-STRICT PYTHON PROJECT TEMPLATE
 # Maximum strictness - TypeScript strict mode equivalent
-# Tools: uv + ruff + pyright/pylance + pydantic v2
+# Tools: uv + ruff + basedpyright + pydantic v2
 # Python 3.12+
 # ============================================================
 
@@ -55,7 +55,7 @@ format = [
 # Lint and type check without fixing
 check = [
     {cmd = "ruff check ."},
-    {cmd = "pyright"}
+    {cmd = "basedpyright --level error"}
 ]
 
 # Run with: poe lint or uv run poe lint
@@ -155,7 +155,7 @@ skip-magic-trailing-comma = false
 line-ending = "auto"
 
 # ============================================================
-# PYRIGHT CONFIGURATION - MAXIMUM STRICTNESS
+# Basedpyright CONFIGURATION - MAXIMUM STRICTNESS
 # TypeScript strict mode equivalent
 # ============================================================
 [tool.basedpyrightf]
@@ -334,168 +334,3 @@ exclude_lines = [
     "@abstractmethod",
     "@overload",
 ]
-
-# ============================================================
-# QUICK START GUIDE
-# ============================================================
-#
-# 1. CREATE NEW PROJECT:
-#    mkdir my-project && cd my-project
-#    cp STRICT_PYPROJECT_TEMPLATE.toml pyproject.toml
-#
-# 2. CUSTOMIZE (REQUIRED):
-#    - Change project.name to "my-project"
-#    - Change project.description
-#    - Change project.authors
-#    - Change tool.ruff.lint.isort.known-first-party to ["my_project"]
-#
-# 3. SETUP ENVIRONMENT:
-#    uv venv
-#    source .venv/bin/activate  # Linux/Mac
-#    .venv\Scripts\activate     # Windows
-#    uv pip install -e ".[dev]"
-#
-# 4. CREATE PROJECT STRUCTURE:
-#    mkdir -p src/my_project tests
-#    touch src/my_project/__init__.py
-#    touch tests/__init__.py
-#
-# 5. CREATE .gitignore:
-#    echo ".venv/
-#    __pycache__/
-#    *.py[cod]
-#    .pytest_cache/
-#    .ruff_cache/
-#    .pyright_cache/
-#    .coverage
-#    htmlcov/
-#    dist/
-#    build/
-#    *.egg-info/
-#    .env
-#    .DS_Store" > .gitignore
-#
-# 6. DAILY WORKFLOW:
-#    # Format code
-#    uv run ruff format .
-#
-#    # Lint and auto-fix
-#    uv run ruff check . --fix
-#
-#    # Type check (strict!)
-#    uv run pyright
-#
-#    # Run tests with coverage
-#    uv run pytest
-#
-#    # Full check (run before commit)
-#    uv run ruff format . && uv run ruff check . && uv run pyright && uv run pytest
-#
-# 7. VS CODE SETUP (recommended):
-#    Create .vscode/settings.json:
-#    {
-#      "python.defaultInterpreterPath": ".venv/bin/python",
-#      "python.analysis.typeCheckingMode": "strict",
-#      "python.analysis.autoImportCompletions": true,
-#      "editor.formatOnSave": true,
-#      "editor.codeActionsOnSave": {
-#        "source.organizeImports": true,
-#        "source.fixAll": true
-#      },
-#      "[python]": {
-#        "editor.defaultFormatter": "charliermarsh.ruff"
-#      },
-#      "ruff.enable": true,
-#      "ruff.lint.enable": true,
-#      "ruff.format.args": ["--config", "pyproject.toml"]
-#    }
-#
-# 8. GITHUB ACTIONS CI (optional):
-#    Create .github/workflows/ci.yml:
-#    name: CI
-#    on: [push, pull_request]
-#    jobs:
-#      test:
-#        runs-on: ubuntu-latest
-#        steps:
-#          - uses: actions/checkout@v4
-#          - uses: astral-sh/setup-uv@v1
-#          - run: uv pip install -e ".[dev]"
-#          - run: uv run ruff format --check .
-#          - run: uv run ruff check .
-#          - run: uv run pyright
-#          - run: uv run pytest
-#
-# ============================================================
-# PYDANTIC V2 PATTERNS (IMPORTANT)
-# ============================================================
-#
-# ✅ CORRECT (Pydantic v2):
-# from pydantic import BaseModel, field_validator, model_validator, ConfigDict
-#
-# class User(BaseModel):
-#     model_config = ConfigDict(strict=True)
-#     name: str
-#     age: int
-#
-#     @field_validator('age')
-#     @classmethod
-#     def validate_age(cls, v: int) -> int:
-#         if v < 0:
-#             raise ValueError('age must be positive')
-#         return v
-#
-#     @model_validator(mode='after')
-#     def validate_model(self) -> 'User':
-#         return self
-#
-# ❌ WRONG (Pydantic v1 - deprecated):
-# class User(BaseModel):
-#     class Config:
-#         strict = True
-#
-#     @validator('age')
-#     def validate_age(cls, v):
-#         return v
-#
-# ============================================================
-# STRICTNESS LEVELS
-# ============================================================
-#
-# This template is at MAXIMUM strictness. To reduce:
-#
-# LEVEL 1 - Production Ready (Recommended):
-#   - Keep all current settings
-#   - This is the gold standard
-#
-# LEVEL 2 - Slightly Relaxed:
-#   - reportUnknownArgumentType = false
-#   - reportUnknownVariableType = false
-#   - reportUnknownMemberType = false
-#   - reportUnused* = "warning" (instead of "error")
-#
-# LEVEL 3 - Gradual Adoption:
-#   - typeCheckingMode = "standard"
-#   - reportMissingSuperCall = false
-#   - reportImplicitOverride = false
-#
-# ============================================================
-# TROUBLESHOOTING
-# ============================================================
-#
-# Q: Too many type errors from third-party libraries?
-# A: Add to exclude list or set reportMissingTypeStubs = false
-#
-# Q: Pyright too slow?
-# A: Add large directories to exclude list
-#
-# Q: Ruff "ALL" too strict?
-# A: Replace "ALL" with specific rule codes (see template above)
-#
-# Q: Coverage failing?
-# A: Reduce fail_under from 80 to 70 or 60
-#
-# Q: How to ignore specific errors temporarily?
-# A: Use # type: ignore[error-code] or # noqa: RULE_CODE
-#    But fix them eventually - strict mode means no ignores!
-#
