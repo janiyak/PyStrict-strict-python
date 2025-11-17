@@ -26,12 +26,12 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-		"basedpyright>=1.31.7",
+    "basedpyright>=1.31.7",
     "ruff",
     "gitingest",
-		"poethepoet",
-		"radon",
-		"vulture"
+    "poethepoet",
+    "radon",
+    "vulture"
 ]
 
 [tool.setuptools.packages.find]
@@ -80,7 +80,7 @@ quality = [
     {cmd = "ruff format ."},
     {cmd = "ruff check . --fix"},
     {cmd = "basedpyright --level error"},
-    {cmd = "vulture . --min-confidence 80"},
+    {cmd = "vulture . --min-confidence 80 --exclude .venv,build,dist,docs,scripts,tests"},
     {cmd = "radon cc . -a -nb"}
 ]
 
