@@ -83,8 +83,8 @@ quality = [
     {cmd = "ruff format ."},
     {cmd = "ruff check . --fix"},
     {cmd = "basedpyright --level error"},
+    {cmd = "radon cc . -a -nb"},
     {cmd = "skylos . --quality --danger"},
-    {cmd = "radon cc . -a -nb"}
 ]
 
 # ============================================================
