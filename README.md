@@ -20,7 +20,7 @@ The goal is **production‑grade quality** from day one: strong typing, clean st
 - **Config & env**: `python-dotenv`, `typing-extensions`
 - **Data validation**: `pydantic>=2`
 - **Task runner**: `poethepoet` (format, check, metrics, etc.)
-- **Code quality tools**: `radon`, `vulture`
+- **Code quality tools**: `radon`, `skylos`
 - **Testing & coverage**: `pytest` + `coverage` (80% minimum by default)
 
 Everything is wired through **`pyproject.toml`** so you have a single source of truth.

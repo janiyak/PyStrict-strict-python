@@ -34,7 +34,7 @@ dev = [
     "gitingest",
     "poethepoet",
     "radon",
-    "vulture"
+    "skylos"
 ]
 
 [tool.setuptools.packages.find]
@@ -72,7 +72,7 @@ lint-unsafe = {cmd = "ruff check . --fix --unsafe-fixes"}
 # Run with: poe metrics or uv run poe metrics
 # Check code quality: dead code, complexity, and maintainability
 metrics = [
-    {cmd = "vulture . --min-confidence 80"},
+    {cmd = "skylos . --quality"},
     {cmd = "radon cc . -a -nb"},
     {cmd = "radon mi . -nb"}
 ]
@@ -83,7 +83,7 @@ quality = [
     {cmd = "ruff format ."},
     {cmd = "ruff check . --fix"},
     {cmd = "basedpyright --level error"},
-    {cmd = "vulture . --min-confidence 80 --exclude .venv,build,dist,docs,scripts,tests"},
+    {cmd = "skylos . --quality --danger"},
     {cmd = "radon cc . -a -nb"}
 ]
 
