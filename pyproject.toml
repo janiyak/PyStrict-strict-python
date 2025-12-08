@@ -30,6 +30,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "basedpyright>=1.31.7",
+    "pre-commit",
     "ruff",
     "gitingest",
     "poethepoet",
