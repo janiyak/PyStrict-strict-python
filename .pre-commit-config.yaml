@@ -1,6 +1,7 @@
+# Run `uv run pre-commit autoupdate` periodically to update hook versions
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.8
+    rev: v0.14.8
     hooks:
       - id: ruff-format
         name: ruff-format (commit)
